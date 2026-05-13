@@ -1,0 +1,20 @@
+name: 로또 데이터 자동 업데이트
+on:
+  schedule:
+    - cron: '0 22 * * 6'
+  workflow_dispatch:
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - run: python scripts/fetch_lotto.py
+      - run: |
+          git config user.name "lotto-bot"
+          git config user.email "bot@lotto"
+          git add data/lotto.json
+          git diff --staged --quiet || git commit -m "로또 데이터 업데이트"
+          git push
