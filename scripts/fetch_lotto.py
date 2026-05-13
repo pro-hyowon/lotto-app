@@ -1,20 +1,15 @@
-import urllib.request, json, os, time
+import urllib.request, json, os
 
 def fetch_all():
     results = []
-    round_num = 1
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36',
-        'Referer': 'https://www.dhlottery.co.kr/gameResult.do?method=byWin',
-        'Accept': 'application/json, text/javascript, */*',
-    }
-    while True:
-        url = f"https://www.dhlottery.co.kr/common.do?method=getLottoNumber&drwNo={round_num}"
+    # 무료 로또 API (GitHub Actions에서 접근 가능)
+    for round_num in range(1, 1300):
+        url = f"https://lotto.ntck.co.kr/api/lotto/{round_num}"
         try:
-            req = urllib.request.Request(url, headers=headers)
+            req = urllib.request.Request(url, headers={'User-Agent':'Mozilla/5.0'})
             with urllib.request.urlopen(req, timeout=10) as r:
                 data = json.loads(r.read())
-            if data.get('returnValue') != 'success':
+            if not data or 'drwtNo1' not in data:
                 break
             results.append({
                 "round": data["drwNo"],
@@ -24,12 +19,7 @@ def fetch_all():
                 "prize": data.get("firstWinamnt", 0),
                 "winners": data.get("firstPrzwnerCo", 0)
             })
-            round_num += 1
-            if round_num % 100 == 0:
-                print(f"{round_num}회차까지 수집...")
-                time.sleep(0.5)
-        except Exception as e:
-            print(f"{round_num}회차 오류: {e}")
+        except:
             break
     return results
 
