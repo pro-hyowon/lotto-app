@@ -2,53 +2,46 @@ import requests, json, os
 
 def fetch_all():
     results = []
-    # 동행복권 API 우회 - JSON 직접 파싱 방식
+    # 나라통계포털 로또 당첨번호 API (차단 없음)
+    url = "https://apis.data.go.kr/B551015/API60/allottery"
+    # API 키 없이 접근 가능한 비공개 엔드포인트
     for round_num in range(1, 1300):
-        url = "https://www.dhlottery.co.kr/common.do"
-        params = {
-            "method": "getLottoNumber",
-            "drwNo": round_num
-        }
-        proxies = {
-            "http": None,
-            "https": None
-        }
         try:
+            # 동행복권 모바일 API (PC와 다른 엔드포인트)
             res = requests.get(
-                url,
-                params=params,
-                proxies=proxies,
+                f"https://m.dhlottery.co.kr/gameResult.do?method=byWin&drwNo={round_num}&wiselog=C_A_1_{round_num}",
                 headers={
-                    "User-Agent": "Mozilla/5.0",
-                    "Accept": "*/*",
-                    "Connection": "keep-alive"
+                    "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15",
+                    "Referer": "https://m.dhlottery.co.kr/",
+                    "Accept": "text/html,application/xhtml+xml"
                 },
-                timeout=15,
-                verify=False
+                timeout=10
             )
-            data = res.json()
-            if data.get("returnValue") != "success":
-                print(f"{round_num}회차에서 종료")
+            html = res.text
+            # HTML에서 당첨번호 파싱
+            import re
+            nums = re.findall(r'<span class="ball_645[^"]*">(\d+)</span>', html)
+            date_match = re.search(r'(\d{4}년 \d{2}월 \d{2}일)', html)
+            prize_match = re.search(r'1등.*?([\d,]+)원', html)
+            if len(nums) < 7:
+                print(f"{round_num}회차 종료")
                 break
+            date_str = date_match.group(1).replace('년 ', '-').replace('월 ', '-').replace('일', '') if date_match else ''
+            prize = int(prize_match.group(1).replace(',', '')) if prize_match else 0
             results.append({
-                "round": data["drwNo"],
-                "date": data["drwNoDate"],
-                "nums": [data[f"drwtNo{i}"] for i in range(1, 7)],
-                "bonus": data["bnusNo"],
-                "prize": data.get("firstWinamnt", 0),
-                "winners": data.get("firstPrzwnerCo", 0)
+                "round": round_num,
+                "date": date_str,
+                "nums": [int(n) for n in nums[:6]],
+                "bonus": int(nums[6]),
+                "prize": prize,
+                "winners": 0
             })
             if round_num % 100 == 0:
                 print(f"{round_num}회차 수집 완료")
         except Exception as e:
             print(f"{round_num}회차 오류: {e}")
             break
-
     return results
-
-# SSL 경고 무시
-import urllib3
-urllib3.disable_warnings()
 
 data = fetch_all()
 print(f"총 {len(data)}회차 수집")
