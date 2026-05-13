@@ -142,26 +142,63 @@ body{font-family:'Noto Sans KR',sans-serif;background:#f0f2f5;color:#1a1a2e;min-
     <!-- STATS -->
     <div class="page active" id="page-stats">
 
-      <!-- 최신 당첨 번호 -->
+      <!-- 최신 당첨 번호 표시 -->
       <div id="latest-card" style="background:linear-gradient(135deg,#fff8e1,#fffde7);border:1.5px solid #ffd54f;border-radius:20px;padding:16px;margin-bottom:12px;box-shadow:0 2px 12px rgba(200,146,10,0.13)">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
           <div>
             <div style="font-size:13px;font-weight:800;color:var(--gold)">🏆 최신 당첨 번호</div>
-            <div style="font-size:11px;color:var(--txt3);margin-top:2px" id="latest-round-label">불러오는 중...</div>
+            <div style="font-size:11px;color:var(--txt3);margin-top:2px" id="latest-round-label">입력된 번호가 없습니다</div>
           </div>
-          <div id="latest-prize" style="text-align:right;font-size:11px;color:var(--txt3)"></div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <div id="latest-prize" style="text-align:right;font-size:11px;color:var(--txt3)"></div>
+            <button onclick="openInput()" style="background:var(--gold);border:none;border-radius:10px;padding:6px 12px;font-size:12px;font-weight:800;color:#fff;cursor:pointer;font-family:inherit">✏️ 입력</button>
+          </div>
         </div>
         <div id="latest-balls" style="display:flex;justify-content:center;align-items:center;gap:6px;flex-wrap:wrap;min-height:52px">
-          <div style="display:flex;gap:6px;align-items:center">
-            <div style="width:20px;height:20px;border-radius:50%;background:#e0e0e0;animation:pulse 1.2s infinite"></div>
-            <div style="width:20px;height:20px;border-radius:50%;background:#e0e0e0;animation:pulse 1.2s infinite 0.1s"></div>
-            <div style="width:20px;height:20px;border-radius:50%;background:#e0e0e0;animation:pulse 1.2s infinite 0.2s"></div>
-            <div style="width:20px;height:20px;border-radius:50%;background:#e0e0e0;animation:pulse 1.2s infinite 0.3s"></div>
-            <div style="width:20px;height:20px;border-radius:50%;background:#e0e0e0;animation:pulse 1.2s infinite 0.4s"></div>
-            <div style="width:20px;height:20px;border-radius:50%;background:#e0e0e0;animation:pulse 1.2s infinite 0.5s"></div>
-          </div>
+          <div style="font-size:12px;color:var(--txt3);text-align:center;line-height:1.8">매주 토요일 추첨 후<br>✏️ 입력 버튼으로 번호를 저장하세요</div>
         </div>
         <div id="latest-date" style="text-align:center;font-size:10px;color:var(--txt3);margin-top:8px"></div>
+      </div>
+
+      <!-- 번호 입력 모달 -->
+      <div id="input-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:999;align-items:flex-end;justify-content:center">
+        <div style="background:#fff;border-radius:24px 24px 0 0;padding:24px 20px 40px;width:100%;max-width:480px">
+          <div style="font-size:16px;font-weight:900;color:var(--txt1);margin-bottom:20px;text-align:center">🏆 당첨 번호 입력</div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+            <div>
+              <div style="font-size:11px;font-weight:700;color:var(--txt2);margin-bottom:5px">회차</div>
+              <input id="inp-round" type="number" placeholder="예) 1168" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:12px;font-size:15px;font-family:inherit;outline:none">
+            </div>
+            <div>
+              <div style="font-size:11px;font-weight:700;color:var(--txt2);margin-bottom:5px">추첨일</div>
+              <input id="inp-date" type="date" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-family:inherit;outline:none">
+            </div>
+          </div>
+
+          <div style="font-size:11px;font-weight:700;color:var(--txt2);margin-bottom:8px">당첨 번호 6개</div>
+          <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:7px;margin-bottom:14px">
+            <input id="n1" type="number" min="1" max="45" placeholder="1" style="text-align:center;padding:10px 4px;border:1.5px solid var(--border);border-radius:12px;font-size:16px;font-weight:800;font-family:inherit;outline:none;width:100%">
+            <input id="n2" type="number" min="1" max="45" placeholder="2" style="text-align:center;padding:10px 4px;border:1.5px solid var(--border);border-radius:12px;font-size:16px;font-weight:800;font-family:inherit;outline:none;width:100%">
+            <input id="n3" type="number" min="1" max="45" placeholder="3" style="text-align:center;padding:10px 4px;border:1.5px solid var(--border);border-radius:12px;font-size:16px;font-weight:800;font-family:inherit;outline:none;width:100%">
+            <input id="n4" type="number" min="1" max="45" placeholder="4" style="text-align:center;padding:10px 4px;border:1.5px solid var(--border);border-radius:12px;font-size:16px;font-weight:800;font-family:inherit;outline:none;width:100%">
+            <input id="n5" type="number" min="1" max="45" placeholder="5" style="text-align:center;padding:10px 4px;border:1.5px solid var(--border);border-radius:12px;font-size:16px;font-weight:800;font-family:inherit;outline:none;width:100%">
+            <input id="n6" type="number" min="1" max="45" placeholder="6" style="text-align:center;padding:10px 4px;border:1.5px solid var(--border);border-radius:12px;font-size:16px;font-weight:800;font-family:inherit;outline:none;width:100%">
+          </div>
+
+          <div style="font-size:11px;font-weight:700;color:var(--txt2);margin-bottom:8px">보너스 번호</div>
+          <input id="nb" type="number" min="1" max="45" placeholder="보너스" style="width:100%;text-align:center;padding:10px;border:1.5px solid var(--border);border-radius:12px;font-size:16px;font-weight:800;font-family:inherit;outline:none;margin-bottom:14px">
+
+          <div style="font-size:11px;font-weight:700;color:var(--txt2);margin-bottom:8px">1등 당첨금 (선택)</div>
+          <input id="inp-prize" type="number" placeholder="예) 2100000000" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-family:inherit;outline:none;margin-bottom:20px">
+
+          <div id="inp-error" style="color:#c0392b;font-size:12px;text-align:center;margin-bottom:10px;display:none"></div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <button onclick="closeInput()" style="padding:14px;border:1.5px solid var(--border);border-radius:14px;background:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--txt2)">취소</button>
+            <button onclick="saveInput()" style="padding:14px;border:none;border-radius:14px;background:linear-gradient(135deg,#ffd54f,#c8920a);font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;color:#fff">저장</button>
+          </div>
+        </div>
       </div>
 
       <div class="metric-grid">
@@ -450,46 +487,64 @@ function showPage(id){
   document.querySelector('.content').scrollTop=0;
 }
 buildFreqChart();buildHotCold();buildOE();buildSumBars();buildRange();buildConsec();
-fetchLatestLotto();
-
-async function fetchLatestLotto(){
-  // GitHub Pages의 data/lotto.json 에서 직접 읽기
-  try{
-    document.getElementById('latest-round-label').textContent='데이터 불러오는 중...';
-    const res=await fetch('./data/lotto.json');
-    if(!res.ok) throw new Error('failed');
-    const data=await res.json();
-    if(!data||data.length===0) throw new Error('empty');
-
-    // 가장 마지막 회차 (최신)
-    const found=data[data.length-1];
-    const nums=found.nums;
-    const bonus=found.bonus;
-    const prize=found.prize?Math.round(found.prize/100000000).toLocaleString()+'억원':'비공개';
-    const winners=found.winners||0;
-
-    document.getElementById('latest-round-label').textContent=`제 ${found.round}회 당첨 번호`;
-    document.getElementById('latest-prize').innerHTML=
-      `<div style="font-weight:900;color:var(--gold);font-size:14px">1등 ${prize}</div>
-       <div style="font-size:11px;color:var(--txt3);margin-top:2px">${winners}명 당첨</div>`;
-    document.getElementById('latest-date').textContent=`추첨일: ${found.date}`;
-    document.getElementById('latest-balls').innerHTML=
-      `<div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;justify-content:center">
-        ${nums.map(n=>`<div class="ball ball-md ${getBallClass(n)}" style="box-shadow:0 2px 8px rgba(0,0,0,0.18)">${n}</div>`).join('')}
-        <div style="font-size:20px;font-weight:900;color:#ccc;margin:0 1px">+</div>
-        <div style="position:relative;margin-top:10px">
-          <div style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:800;color:#888;white-space:nowrap;background:#fff;padding:0 3px;border-radius:4px">보너스</div>
-          <div class="ball ball-md" style="background:linear-gradient(145deg,#bbb,#777);box-shadow:0 2px 8px rgba(0,0,0,0.2)">${bonus}</div>
-        </div>
-      </div>`;
-  }catch(e){
-    document.getElementById('latest-round-label').textContent='데이터를 불러올 수 없습니다';
-    document.getElementById('latest-balls').innerHTML=
-      `<div style="font-size:12px;color:var(--txt3);padding:10px;text-align:center;line-height:1.8">
-        Actions에서 워크플로우를 실행하면<br>자동으로 표시됩니다 🙂
-      </div>`;
-  }
+function openInput(){
+  document.getElementById('input-modal').style.display='flex';
+  document.getElementById('inp-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('inp-error').style.display='none';
 }
+function closeInput(){
+  document.getElementById('input-modal').style.display='none';
+}
+function saveInput(){
+  const round=parseInt(document.getElementById('inp-round').value);
+  const date=document.getElementById('inp-date').value;
+  const nums=[1,2,3,4,5,6].map(i=>parseInt(document.getElementById('n'+i).value));
+  const bonus=parseInt(document.getElementById('nb').value);
+  const prize=parseInt(document.getElementById('inp-prize').value)||0;
+  const err=document.getElementById('inp-error');
+  if(!round||round<1){err.textContent='회차를 입력해주세요';err.style.display='block';return;}
+  if(!date){err.textContent='추첨일을 입력해주세요';err.style.display='block';return;}
+  if(nums.some(n=>isNaN(n)||n<1||n>45)){err.textContent='번호는 1~45 사이로 입력해주세요';err.style.display='block';return;}
+  if(new Set(nums).size!==6){err.textContent='번호 6개가 모두 달라야 합니다';err.style.display='block';return;}
+  if(isNaN(bonus)||bonus<1||bonus>45){err.textContent='보너스 번호를 입력해주세요';err.style.display='block';return;}
+  const entry={round,date,nums:nums.sort((a,b)=>a-b),bonus,prize};
+  let history=[];
+  try{history=JSON.parse(localStorage.getItem('lotto_history')||'[]');}catch(e){}
+  const idx=history.findIndex(h=>h.round===round);
+  if(idx>=0)history[idx]=entry;else history.push(entry);
+  history.sort((a,b)=>b.round-a.round);
+  localStorage.setItem('lotto_history',JSON.stringify(history));
+  ['inp-round','n1','n2','n3','n4','n5','n6','nb','inp-prize'].forEach(id=>{document.getElementById(id).value='';});
+  closeInput();
+  renderLatest();
+}
+function renderLatest(){
+  let history=[];
+  try{history=JSON.parse(localStorage.getItem('lotto_history')||'[]');}catch(e){}
+  if(!history||history.length===0){
+    document.getElementById('latest-round-label').textContent='입력된 번호가 없습니다';
+    document.getElementById('latest-prize').innerHTML='';
+    document.getElementById('latest-balls').innerHTML='<div style="font-size:12px;color:var(--txt3);text-align:center;line-height:1.8">매주 토요일 추첨 후<br>✏️ 입력 버튼으로 번호를 저장하세요</div>';
+    document.getElementById('latest-date').textContent='';
+    return;
+  }
+  const f=history[0];
+  const prize=f.prize?Math.round(f.prize/100000000).toLocaleString()+'억원':'';
+  document.getElementById('latest-round-label').textContent=`제 ${f.round}회 당첨 번호`;
+  document.getElementById('latest-prize').innerHTML=prize?`<div style="font-weight:900;color:var(--gold);font-size:14px">1등 ${prize}</div>`:'';
+  document.getElementById('latest-date').textContent=`추첨일: ${f.date}`;
+  document.getElementById('latest-balls').innerHTML=
+    `<div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;justify-content:center">
+      ${f.nums.map(n=>`<div class="ball ball-md ${getBallClass(n)}" style="box-shadow:0 2px 8px rgba(0,0,0,0.18)">${n}</div>`).join('')}
+      <div style="font-size:20px;font-weight:900;color:#ccc;margin:0 1px">+</div>
+      <div style="position:relative;margin-top:10px">
+        <div style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:800;color:#888;white-space:nowrap;background:#fff8e1;padding:0 3px;border-radius:4px">보너스</div>
+        <div class="ball ball-md" style="background:linear-gradient(145deg,#bbb,#777);box-shadow:0 2px 8px rgba(0,0,0,0.2)">${f.bonus}</div>
+      </div>
+    </div>`;
+}
+document.getElementById('input-modal').addEventListener('click',function(e){if(e.target===this)closeInput();});
+renderLatest();
 </script>
 </body>
 </html>
