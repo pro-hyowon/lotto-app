@@ -1,12 +1,18 @@
-import urllib.request, json, os
+import urllib.request, json, os, time
 
 def fetch_all():
     results = []
     round_num = 1
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36',
+        'Referer': 'https://www.dhlottery.co.kr/gameResult.do?method=byWin',
+        'Accept': 'application/json, text/javascript, */*',
+    }
     while True:
         url = f"https://www.dhlottery.co.kr/common.do?method=getLottoNumber&drwNo={round_num}"
         try:
-            with urllib.request.urlopen(url, timeout=5) as r:
+            req = urllib.request.Request(url, headers=headers)
+            with urllib.request.urlopen(req, timeout=10) as r:
                 data = json.loads(r.read())
             if data.get('returnValue') != 'success':
                 break
@@ -19,7 +25,11 @@ def fetch_all():
                 "winners": data.get("firstPrzwnerCo", 0)
             })
             round_num += 1
-        except:
+            if round_num % 100 == 0:
+                print(f"{round_num}회차까지 수집...")
+                time.sleep(0.5)
+        except Exception as e:
+            print(f"{round_num}회차 오류: {e}")
             break
     return results
 
