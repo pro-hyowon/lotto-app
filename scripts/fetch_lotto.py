@@ -1,51 +1,62 @@
 import requests, json, os
 
 def fetch_all():
+    # 공개된 로또 데이터 GitHub raw 파일 활용
+    urls = [
+        "https://raw.githubusercontent.com/roeniss/lotto-numbers/main/numbers.json",
+        "https://raw.githubusercontent.com/kimjunil/lotto/master/lotto.json",
+    ]
+    
+    for url in urls:
+        try:
+            res = requests.get(url, timeout=15)
+            if res.status_code == 200:
+                data = res.json()
+                if data and len(data) > 100:
+                    print(f"성공: {len(data)}회차 수집")
+                    return data
+        except Exception as e:
+            print(f"실패: {e}")
+            continue
+    
+    # 위가 모두 실패하면 직접 크롤링 시도
     results = []
-    # 나라통계포털 로또 당첨번호 API (차단 없음)
-    url = "https://apis.data.go.kr/B551015/API60/allottery"
-    # API 키 없이 접근 가능한 비공개 엔드포인트
     for round_num in range(1, 1300):
         try:
-            # 동행복권 모바일 API (PC와 다른 엔드포인트)
             res = requests.get(
-                f"https://m.dhlottery.co.kr/gameResult.do?method=byWin&drwNo={round_num}&wiselog=C_A_1_{round_num}",
-                headers={
-                    "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15",
-                    "Referer": "https://m.dhlottery.co.kr/",
-                    "Accept": "text/html,application/xhtml+xml"
-                },
+                "https://www.dhlottery.co.kr/common.do",
+                params={"method": "getLottoNumber", "drwNo": round_num},
+                headers={"User-Agent": "lotto-tracker/1.0"},
                 timeout=10
             )
-            html = res.text
-            # HTML에서 당첨번호 파싱
-            import re
-            nums = re.findall(r'<span class="ball_645[^"]*">(\d+)</span>', html)
-            date_match = re.search(r'(\d{4}년 \d{2}월 \d{2}일)', html)
-            prize_match = re.search(r'1등.*?([\d,]+)원', html)
-            if len(nums) < 7:
-                print(f"{round_num}회차 종료")
+            data = res.json()
+            if data.get("returnValue") != "success":
                 break
-            date_str = date_match.group(1).replace('년 ', '-').replace('월 ', '-').replace('일', '') if date_match else ''
-            prize = int(prize_match.group(1).replace(',', '')) if prize_match else 0
             results.append({
-                "round": round_num,
-                "date": date_str,
-                "nums": [int(n) for n in nums[:6]],
-                "bonus": int(nums[6]),
-                "prize": prize,
-                "winners": 0
+                "round": data["drwNo"],
+                "date": data["drwNoDate"],
+                "nums": [data[f"drwtNo{i}"] for i in range(1, 7)],
+                "bonus": data["bnusNo"],
+                "prize": data.get("firstWinamnt", 0),
+                "winners": data.get("firstPrzwnerCo", 0)
             })
             if round_num % 100 == 0:
-                print(f"{round_num}회차 수집 완료")
+                print(f"{round_num}회차 완료")
         except Exception as e:
             print(f"{round_num}회차 오류: {e}")
             break
     return results
 
 data = fetch_all()
-print(f"총 {len(data)}회차 수집")
+
+# 데이터 형식 통일
+normalized = []
+for d in data:
+    if isinstance(d, dict):
+        normalized.append(d)
+
+print(f"총 {len(normalized)}회차 저장")
 os.makedirs("data", exist_ok=True)
 with open("data/lotto.json", "w", encoding="utf-8") as f:
-    json.dump(data, f, ensure_ascii=False)
-print("저장 완료")
+    json.dump(normalized, f, ensure_ascii=False)
+print("완료")
